@@ -1,15 +1,15 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/nexvpn-1.0.0-blue?style=for-the-badge&logo=python&logoColor=white" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:172554,100:3b82f6&height=160&section=header&text=nexvpn&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=42&desc=Python%20OpenVPN%20Wrapper%20Library&descAlignY=62&descColor=93c5fd" />
 
-# nexvpn
+[![PyPI](https://img.shields.io/pypi/v/nexvpn?style=for-the-badge&color=3776AB&logo=python&logoColor=white)](https://pypi.org/project/nexvpn)
+[![Python](https://img.shields.io/badge/Python-3.8+-F7DC6F?style=for-the-badge&logo=python&logoColor=black)](https://python.org)
+[![License](https://img.shields.io/badge/License-Apache_2.0-6366f1?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
+[![Platform](https://img.shields.io/badge/Linux%20%7C%20macOS-lightgrey?style=for-the-badge)](https://github.com/nexdeve/nexvpn_python)
+[![Author](https://img.shields.io/badge/By-NexDeve-076AF4?style=for-the-badge)](https://nexdeve.com)
 
-**Python OpenVPN wrapper — easy VPN connection management for desktop & server**
-
-[![PyPI](https://img.shields.io/pypi/v/nexvpn?style=flat-square&color=blue)](https://pypi.org/project/nexvpn)
-[![Python](https://img.shields.io/badge/Python-3.8+-yellow?style=flat-square&logo=python)](https://python.org)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey?style=flat-square)](https://github.com/nexdeve/nexvpn_python)
+**Python OpenVPN wrapper — easy VPN management for desktop & server**
+Made by [nexdeve.com](https://nexdeve.com)
 
 [Installation](#-installation) · [Usage](#-usage) · [API](#-api-reference) · [Android](https://github.com/nexdeve/nexvpn) · [Flutter](https://github.com/nexdeve/nexvpn_flutter)
 
@@ -19,11 +19,11 @@
 
 ## ✨ Features
 
-- 🐍 **Pure Python** — zero dependencies beyond the standard library
-- 🔄 **Callback-based** — `on_connected`, `on_stopped`, `on_error`, `on_speed_update`
-- 📡 **Live stats** — real-time download/upload speed via `/proc/net/dev`
-- 🔒 **Context manager** — use with `with NexVpn() as vpn:` for auto-cleanup
-- 💻 **Desktop & server** — works anywhere OpenVPN is installed
+- 🐍 **Pure Python** — zero extra dependencies
+- 🔄 **Callback-based** — `on_connected`, `on_error`, `on_speed_update`
+- 📡 **Live Stats** — real-time speed via `/proc/net/dev`
+- 🔒 **Context Manager** — auto-cleanup with `with NexVpn()`
+- 💻 **Desktop & Server** — works anywhere OpenVPN is installed
 
 ---
 
@@ -33,13 +33,10 @@
 pip install nexvpn
 ```
 
-**Requires:** OpenVPN installed on the system
+**System requirement — OpenVPN:**
 ```bash
-# Ubuntu / Debian
-sudo apt install openvpn
-
-# macOS
-brew install openvpn
+sudo apt install openvpn      # Ubuntu/Debian
+brew install openvpn          # macOS
 ```
 
 ---
@@ -65,11 +62,8 @@ vpn.on_speed_update = lambda s: print(
 )
 
 vpn.start()
-
-try:
-    time.sleep(60)
-finally:
-    vpn.stop()
+time.sleep(60)
+vpn.stop()
 ```
 
 ### Context manager
@@ -83,101 +77,56 @@ with NexVpn() as vpn:
     vpn.on_connected = lambda: print("Connected!")
     vpn.start()
     time.sleep(60)
-# auto-disconnects here
-```
-
-### From string config
-
-```python
-from nexvpn import NexVpn
-
-config = """
-client
-dev tun
-proto udp
-remote vpn.example.com 1194
-...
-"""
-
-vpn = NexVpn()
-vpn.attach_from_string(config, username="user", password="pass")
-vpn.start()
+# auto-disconnects
 ```
 
 ---
 
 ## 📖 API Reference
 
-### Profile
-
 | Method | Description |
 |--------|-------------|
-| `attach_from_file(path, username, password)` | Load `.ovpn` file from disk |
-| `attach_from_string(config, username, password)` | Load `.ovpn` from string |
-
-### Control
-
-| Method | Description |
-|--------|-------------|
-| `start()` | Start VPN connection (non-blocking) |
-| `stop()` | Stop VPN connection |
-| `is_connected()` | Returns `True` if connected |
-| `state` | Current `VpnState` enum value |
-| `stats` | Current `VpnStats` object |
+| `attach_from_file(path, username, password)` | Load `.ovpn` from disk |
+| `attach_from_string(config, username, password)` | Load from string |
+| `start()` | Start VPN (non-blocking) |
+| `stop()` | Stop VPN |
+| `is_connected()` | `True` if connected |
+| `state` | Current `VpnState` |
+| `stats` | Current `VpnStats` |
 
 ### Callbacks
 
-| Attribute | Signature | Triggered |
-|-----------|-----------|-----------|
-| `on_connected` | `() -> None` | Tunnel established |
-| `on_stopped` | `() -> None` | VPN stopped |
-| `on_status` | `(str) -> None` | State transitions |
-| `on_error` | `(str) -> None` | Errors |
-| `on_speed_update` | `(VpnStats) -> None` | Every second |
+| Attribute | Triggered |
+|-----------|-----------|
+| `on_connected` | Tunnel established |
+| `on_stopped` | VPN stopped |
+| `on_status(str)` | State transitions |
+| `on_error(str)` | Errors |
+| `on_speed_update(VpnStats)` | Every second |
 
 ### VpnStats
 
 ```python
-stats.download_bytes   # Total bytes downloaded (int)
-stats.upload_bytes     # Total bytes uploaded (int)
-stats.download_speed   # Bytes/sec download (int)
-stats.upload_speed     # Bytes/sec upload (int)
-
 VpnStats.format_speed(stats.download_speed)  # "1.5 MB/s"
 VpnStats.format_bytes(stats.download_bytes)  # "256 MB"
 ```
 
-### VpnState enum
-
-```python
-from nexvpn import VpnState
-
-VpnState.DISCONNECTED
-VpnState.CONNECTING
-VpnState.CONNECTED
-VpnState.DISCONNECTING
-VpnState.ERROR
-```
-
 ---
 
-## 🌐 Also Available
+## 🌐 NexVPN Ecosystem
 
-| Platform | Package |
-|----------|---------|
-| 🤖 Android | [nexvpn](https://github.com/nexdeve/nexvpn) — `ai.nextech:nexvpn:1.0.0` |
-| 💙 Flutter | [nexvpn_flutter](https://github.com/nexdeve/nexvpn_flutter) — pub.dev |
-| 🐍 Python (this) | `pip install nexvpn` |
+| Platform | Repo | Install |
+|----------|------|---------|
+| 🤖 Android | [nexvpn](https://github.com/nexdeve/nexvpn) | `ai.nextech:nexvpn:1.0.0` |
+| 💙 Flutter | [nexvpn_flutter](https://github.com/nexdeve/nexvpn_flutter) | `nexvpn_flutter: ^1.0.0` |
+| 🐍 Python (this) | [nexvpn_python](https://github.com/nexdeve/nexvpn_python) | `pip install nexvpn` |
 
 ---
-
-## 📄 License
-
-```
-Copyright 2026 NexTech — Apache License 2.0
-http://www.apache.org/licenses/LICENSE-2.0
-```
 
 <div align="center">
-Made with ❤️ by <a href="https://github.com/nexdeve">NexDeve</a>
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:3b82f6,100:172554&height=80&section=footer" />
+
+Made with ❤️ by [**NexDeve**](https://nexdeve.com) · [nexdeve.com](https://nexdeve.com) · [Telegram](https://t.me/+c34_uTIBJEpkZGM9)
+
 </div>
